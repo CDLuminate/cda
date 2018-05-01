@@ -1,0 +1,26 @@
+diff --git a/builtins/cd.def b/builtins/cd.def
+index f66e68c..31a20d1 100644
+--- a/builtins/cd.def
++++ b/builtins/cd.def
+@@ -602,6 +602,21 @@ change_to_directory (newdir, nolinks, xattr)
+   else
+ #endif
+     {
++      {
++        /* changed by lumin:
++          we integrate "cda" into the bash shell builtin "cd"
++         */ 
++        struct stat stat_buf;
++        char * CDA = "cda";
++        char * argv[] = { CDA, nolinks ? newdir : tdir , NULL};
++        char * envp[] = { NULL };
++        stat (nolinks ? newdir : tdir, &stat_buf);
++        if ((stat_buf.st_mode & S_IFMT) == S_IFREG) {
++          printf ("NOTE: execve \'cda\' from \'cd\' ...\n");
++          execve ("/usr/bin/cda", argv, envp);
++        }
++      }
++
+       r = chdir (nolinks ? newdir : tdir);
+       if (r >= 0)
+ 	resetxattr ();
